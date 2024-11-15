@@ -8,80 +8,109 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String _selectedDay = "월";
+  bool _showAdditionalButtons = false; // 추가 버튼 표시 여부
 
-  final Map<String, Widget> _dayContent = {
-    "월": const Center(child: Text('월요일 루틴')),
-    "화": const Center(child: Text('화요일 루틴')),
-    "수": const Center(child: Text('수요일 루틴')),
-    "목": const Center(child: Text('목요일 루틴')),
-    "금": const Center(child: Text('금요일 루틴')),
-    "토": const Center(child: Text('토요일 루틴')),
-    "일": const Center(child: Text('일요일 루틴')),
-  };
-
-  void _selectDay(String day) {
+  void _toggleAdditionalButtons() {
     setState(() {
-      _selectedDay = day;
+      _showAdditionalButtons = !_showAdditionalButtons;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      // Stack을 전체 화면으로 확장
+      body: Stack(
+        alignment: Alignment.bottomRight,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildDateButton("월"),
-                _buildDateButton("화"),
-                _buildDateButton("수"),
-                _buildDateButton("목"),
-                _buildDateButton("금"),
-                _buildDateButton("토"),
-                _buildDateButton("일"),
-              ],
+          Center(
+            child: const Text(
+              'Home Page Content',
+              style: TextStyle(fontSize: 24),
             ),
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: _dayContent[_selectedDay] ?? const Center(child: Text('루틴 없음')),
+          // 첫 번째 추가 버튼 (AI를 활용한 항목 추가하기)
+          if (_showAdditionalButtons)
+            Positioned(
+              bottom: 80,
+              right: 16, // 기본 패딩을 고려하여 16으로 설정
+              child: _buildCustomButton(
+                icon: const Text(
+                  'AI',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                label: 'AI를 활용한 항목 추가하기',
+                color: Colors.lightGreen,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('AI 항목 추가하기 버튼 눌림')),
+                  );
+                },
+              ),
+            ),
+          // 두 번째 추가 버튼 (직접 항목 추가하기)
+          if (_showAdditionalButtons)
+            Positioned(
+              bottom: 140,
+              right: 16,
+              child: _buildCustomButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                label: '직접 항목 추가하기',
+                color: Colors.lightGreen,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('직접 항목 추가하기 버튼 눌림')),
+                  );
+                },
+              ),
+            ),
+          // 메인 플로팅 버튼 (+ 버튼)
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: _toggleAdditionalButtons,
+              child: Icon(_showAdditionalButtons ? Icons.close : Icons.add),
+              backgroundColor: Colors.green,
+            ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.green,
       ),
     );
   }
 
-  Widget _buildDateButton(String day) {
-    bool isSelected = _selectedDay == day;
-    return InkWell(
-      onTap: () => _selectDay(day),
-      child: Column(
+  // 커스텀 버튼 위젯 생성
+  Widget _buildCustomButton({
+    required Widget icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: isSelected ? Colors.red : Colors.grey,
+              color: color,
               shape: BoxShape.circle,
             ),
-            child: Center(
-              child: Text(
-                day,
-                style: const TextStyle(color: Colors.white),
-              ),
+            child: Center(child: icon),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          if (isSelected)
-            const Icon(Icons.arrow_drop_up, color: Colors.red, size: 16),
         ],
       ),
     );
