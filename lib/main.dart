@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Routine App'),
+        title: const Text('푸르게'),
         backgroundColor: Colors.green,
       ),
       body: IndexedStack(
