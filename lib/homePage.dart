@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'newsPage.dart';
+import 'statPage.dart';
+import 'settingPage.dart';  // SettingPage 추가
+import 'loginPage.dart';    // LoginPage 추가
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,7 +12,79 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String _selectedDay = "월";
+  int _currentIndex = 0;  // 현재 선택된 인덱스를 추적
+  final List<Widget> _screens = [
+    const RoutinePage(),  // 하루별 루틴 화면
+    const NewsPage(),
+    const StatsPage(),
+    const SettingPage(),
+  ];
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;  // 탭이 변경되면 선택된 인덱스를 갱신
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("My Routine"),
+        backgroundColor: Colors.green,
+        actions: [
+          // 로그아웃 버튼 추가
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              // 로그아웃 처리 후 로그인 화면으로 이동
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
+      body: _screens[_currentIndex],  // 현재 선택된 화면을 표시
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,  // 탭 클릭 시 화면 전환
+        backgroundColor: Colors.black, // 네비게이션 바 배경을 검정색으로 설정
+        selectedItemColor: Colors.green, // 선택된 아이템 색상
+        unselectedItemColor: Colors.black, // 선택되지 않은 아이템 색상
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: '루틴',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article),
+            label: '뉴스',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: '통계',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: '설정',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RoutinePage extends StatefulWidget {
+  const RoutinePage({super.key});
+
+  @override
+  _RoutinePageState createState() => _RoutinePageState();
+}
+
+class _RoutinePageState extends State<RoutinePage> {
+  String _selectedDay = "월";  // 기본 선택된 요일은 '월요일'
 
   final Map<String, Widget> _dayContent = {
     "월": const Center(child: Text('월요일 루틴')),
@@ -22,7 +98,7 @@ class _HomePageState extends State<HomePage> {
 
   void _selectDay(String day) {
     setState(() {
-      _selectedDay = day;
+      _selectedDay = day;  // 선택된 요일을 갱신
     });
   }
 
@@ -53,7 +129,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {},  // 버튼 클릭 시 동작 정의
         child: const Icon(Icons.add),
         backgroundColor: Colors.green,
       ),
@@ -61,9 +137,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildDateButton(String day) {
-    bool isSelected = _selectedDay == day;
+    bool isSelected = _selectedDay == day;  // 선택된 요일 여부
     return InkWell(
-      onTap: () => _selectDay(day),
+      onTap: () => _selectDay(day),  // 탭 클릭 시 해당 요일로 변경
       child: Column(
         children: [
           Container(
@@ -87,3 +163,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+

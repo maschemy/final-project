@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class InfoPage extends StatelessWidget {
-  const InfoPage({super.key});
+class SettingPage extends StatelessWidget {  // 클래스 이름을 'SettingPage'로 변경
+  const SettingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,3 +21,4 @@ class InfoPage extends StatelessWidget {
     );
   }
 }
+
