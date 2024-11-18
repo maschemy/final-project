@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'newsPage.dart';
+import 'statPage.dart';
+import 'settingPage.dart'; // SettingPage 추가
+import 'loginPage.dart'; // LoginPage 추가
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0; // 현재 선택된 인덱스를 추적
   bool _showAdditionalButtons = false;
   DateTime _selectedDate = DateTime.now();
   final Map<String, List<Item>> _itemsPerDate = {};
@@ -21,6 +26,19 @@ class _HomePageState extends State<HomePage> {
     {'emoji': '🛍️', 'text': '에코백 사용'},
     {'emoji': '🍃', 'text': '채식 식사'},
   ];
+
+  final List<Widget> _screens = [
+    const RoutinePage(),
+    const NewsPage(),
+    const StatsPage(),
+    const SettingPage(),
+  ];
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index; // 탭이 변경되면 선택된 인덱스를 갱신
+    });
+  }
 
   void _toggleAdditionalButtons() {
     setState(() {
@@ -91,6 +109,22 @@ class _HomePageState extends State<HomePage> {
     List<Item> currentItems = _itemsPerDate[_selectedDate.toString()] ?? [];
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("My Routine"),
+        backgroundColor: Colors.green,
+        actions: [
+          // 로그아웃 버튼 추가
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: Stack(
         alignment: Alignment.bottomRight,
         children: [
@@ -161,7 +195,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              // 테이블의 위치를 아래로 내리기 위해 SizedBox 추가
               const SizedBox(height: 20),
               Expanded(child: _buildTable(currentItems)),
             ],
@@ -207,6 +240,33 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.green,
             ),
           ),
+          _screens[_currentIndex]
+        ],
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.black,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: '루틴',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article),
+            label: '뉴스',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: '통계',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: '설정',
+          ),
         ],
       ),
     );
@@ -222,7 +282,7 @@ class _HomePageState extends State<HomePage> {
           TableRow(
             children: [
               Container(
-                height: 60, // 높이 지정
+                height: 60,
                 alignment: Alignment.center,
                 child: Text(item.emoji, style: const TextStyle(fontSize: 32)),
               ),
@@ -246,69 +306,26 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-              Container(
-                height: 60,
-                alignment: Alignment.center,
-                child: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    setState(() {
-                      currentItems.removeAt(i);
-                      if (currentItems.isEmpty) {
-                        _itemsPerDate.remove(_selectedDate.toString());
-                      }
-                    });
-                  },
-                ),
-              ),
             ],
           ),
         );
       } else {
         tableRows.add(
-          TableRow(
+          const TableRow(
             children: [
-              Container(
-                height: 60,
-                alignment: Alignment.center,
-                child: const SizedBox(),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.center,
-                child: const SizedBox(),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.center,
-                child: const SizedBox(),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.center,
-                child: const SizedBox(),
-              ),
+              SizedBox(height: 60),
+              SizedBox(height: 60),
+              SizedBox(height: 60),
             ],
           ),
         );
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.grey[200],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Table(
-        border: TableBorder.all(
-          color: Colors.grey,
-          width: 2,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        columnWidths: const {
-          0: FixedColumnWidth(60),
-          1: FlexColumnWidth(),
-          2: FixedColumnWidth(60),
-          3: FixedColumnWidth(60),
-        },
+        border: TableBorder.all(color: Colors.grey),
         children: tableRows,
       ),
     );
@@ -318,36 +335,16 @@ class _HomePageState extends State<HomePage> {
     required Widget icon,
     required String label,
     required Color color,
-    required VoidCallback onTap,
+    required void Function() onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-            child: Center(child: icon),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+    return FloatingActionButton.extended(
+      onPressed: onTap,
+      label: Text(label),
+      icon: icon,
+      backgroundColor: color,
     );
   }
 }
-
 class Item {
   String emoji;
   String text;
@@ -359,3 +356,20 @@ class Item {
     required this.checked,
   });
 }
+// 수정된 RoutinePage 클래스 (빈 화면)
+class RoutinePage extends StatelessWidget {
+  const RoutinePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox.shrink(); // 빈 화면으로 변경
+  }
+}
+
+
+
+
+
+
+
+
