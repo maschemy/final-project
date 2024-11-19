@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "154765153066",
+    "project_id": "final-project-dd774",
+    "storage_bucket": "final-project-dd774.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154765153066:android:ffe607f18fe0491f7a0453",
+        "android_client_info": {
+          "package_name": "com.example.pruge2024"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "154765153066-m5i0ao982krg9911g4sfcvsg6kkghc98.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pruge2024",
+            "certificate_hash": "6a947364ec5c9f67585a69155852f0cacd5aaa2f"
+          }
+        },
+        {
+          "client_id": "154765153066-i9lffr96i5s435sjdjjbr0rc8q03aros.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWTIVFdMHyweRoq7Ima9ZTNb8gZY_B36k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "154765153066-i9lffr96i5s435sjdjjbr0rc8q03aros.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "154765153066-2rfl8th46fflc2ua1iu66g32eatft0s4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pruge2024"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

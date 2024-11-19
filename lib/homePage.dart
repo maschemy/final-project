@@ -282,20 +282,38 @@ class _HomePageState extends State<HomePage> {
           TableRow(
             children: [
               Container(
-                height: 60,
+                height: 50,
                 alignment: Alignment.center,
-                child: Text(item.emoji, style: const TextStyle(fontSize: 32)),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.center,
-                child: Text(
-                  item.text,
-                  style: const TextStyle(fontSize: 18),
+                child: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    setState(() {
+                      currentItems.removeAt(i);
+                      if (currentItems.isEmpty) {
+                        _itemsPerDate.remove(_selectedDate.toString());
+                      }
+                    });
+                  },
                 ),
               ),
               Container(
-                height: 60,
+                  height: 50, // 높이 지정
+                  alignment: Alignment.center,
+                  child: Row (
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(item.emoji, style: const TextStyle(fontSize: 25),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        item.text,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  )
+              ),
+              Container(
+                height: 50,
                 alignment: Alignment.center,
                 child: Checkbox(
                   value: item.checked,
@@ -311,11 +329,23 @@ class _HomePageState extends State<HomePage> {
         );
       } else {
         tableRows.add(
-          const TableRow(
+          TableRow(
             children: [
-              SizedBox(height: 60),
-              SizedBox(height: 60),
-              SizedBox(height: 60),
+              Container(
+                height: 50,
+                alignment: Alignment.center,
+                child: const SizedBox(),
+              ),
+              Container(
+                height: 50,
+                alignment: Alignment.center,
+                child: const SizedBox(),
+              ),
+              Container(
+                height: 50,
+                alignment: Alignment.center,
+                child: const SizedBox(),
+              ),
             ],
           ),
         );
@@ -323,13 +353,108 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Table(
-        border: TableBorder.all(color: Colors.grey),
-        children: tableRows,
-      ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+        child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: List.generate(tableRows.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.5),
+                    child: Text(
+                      '${index + 1}',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(width: 15),
+              Expanded(child: Table(
+                border: TableBorder.all(
+                  color: Colors.grey,
+                  width: 2,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                columnWidths: const {
+                  0: FixedColumnWidth(100),
+                  1: FlexColumnWidth(),
+                  2: FixedColumnWidth(50),
+                },
+                children: tableRows.map((row) {
+                  return TableRow(
+                    children: row.children.map((cell) {
+                      return Container(
+                        color: Colors.grey.shade200, // 셀 내부 배경색을 회색으로 설정
+                        child: cell,
+                      );
+                    }).toList(),
+                  );
+                }).toList(),
+              ),)
+            ]
+        )
     );
   }
+
+  // Widget _buildTable(List<Item> currentItems) {
+  //   List<TableRow> tableRows = [];
+  //
+  //   for (int i = 0; i < 7; i++) {
+  //     if (i < currentItems.length) {
+  //       final item = currentItems[i];
+  //       tableRows.add(
+  //         TableRow(
+  //           children: [
+  //             Container(
+  //               height: 60,
+  //               alignment: Alignment.center,
+  //               child: Text(item.emoji, style: const TextStyle(fontSize: 32)),
+  //             ),
+  //             Container(
+  //               height: 60,
+  //               alignment: Alignment.center,
+  //               child: Text(
+  //                 item.text,
+  //                 style: const TextStyle(fontSize: 18),
+  //               ),
+  //             ),
+  //             Container(
+  //               height: 60,
+  //               alignment: Alignment.center,
+  //               child: Checkbox(
+  //                 value: item.checked,
+  //                 onChanged: (value) {
+  //                   setState(() {
+  //                     item.checked = value ?? false;
+  //                   });
+  //                 },
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     } else {
+  //       tableRows.add(
+  //         const TableRow(
+  //           children: [
+  //             SizedBox(height: 60),
+  //             SizedBox(height: 60),
+  //             SizedBox(height: 60),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   }
+  //
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 20),
+  //     child: Table(
+  //       border: TableBorder.all(color: Colors.grey),
+  //       children: tableRows,
+  //     ),
+  //   );
+  // }
 
   Widget _buildCustomButton({
     required Widget icon,
