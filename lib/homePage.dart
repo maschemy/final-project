@@ -49,8 +49,10 @@ class _HomePageState extends State<HomePage> {
   List<DateTime> _getCurrentWeekDates() {
     DateTime today = _selectedDate;
     int currentWeekday = today.weekday;
-    DateTime firstDayOfWeek = today.subtract(Duration(days: currentWeekday - 1));
-    return List.generate(7, (index) => firstDayOfWeek.add(Duration(days: index)));
+    DateTime firstDayOfWeek =
+        today.subtract(Duration(days: currentWeekday - 1));
+    return List.generate(
+        7, (index) => firstDayOfWeek.add(Duration(days: index)));
   }
 
   void _addPredefinedItem() async {
@@ -76,7 +78,8 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 final item = _predefinedItems[index];
                 return ListTile(
-                  leading: Text(item['emoji']!, style: const TextStyle(fontSize: 24)),
+                  leading: Text(item['emoji']!,
+                      style: const TextStyle(fontSize: 24)),
                   title: Text(item['text']!),
                   onTap: () {
                     Navigator.of(context).pop(item);
@@ -134,7 +137,8 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   currentMonthYear,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               GestureDetector(
@@ -142,11 +146,13 @@ class _HomePageState extends State<HomePage> {
                   if (details.primaryVelocity != null) {
                     if (details.primaryVelocity! < 0) {
                       setState(() {
-                        _selectedDate = _selectedDate.add(const Duration(days: 7));
+                        _selectedDate =
+                            _selectedDate.add(const Duration(days: 7));
                       });
                     } else if (details.primaryVelocity! > 0) {
                       setState(() {
-                        _selectedDate = _selectedDate.subtract(const Duration(days: 7));
+                        _selectedDate =
+                            _selectedDate.subtract(const Duration(days: 7));
                       });
                     }
                   }
@@ -167,23 +173,34 @@ class _HomePageState extends State<HomePage> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.green : Colors.transparent,
+                            color:
+                                isSelected ? Colors.green : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(8),
                           child: Column(
                             children: [
                               Text(
-                                ['월', '화', '수', '목', '금', '토', '일'][date.weekday - 1],
+                                [
+                                  '월',
+                                  '화',
+                                  '수',
+                                  '목',
+                                  '금',
+                                  '토',
+                                  '일'
+                                ][date.weekday - 1],
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.black,
+                                  color:
+                                      isSelected ? Colors.white : Colors.black,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '${date.day}',
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.black,
+                                  color:
+                                      isSelected ? Colors.white : Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -196,7 +213,43 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              Expanded(child: _buildTable(currentItems)),
+              Expanded(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 30), // 회색 박스
+                      child: Container(
+                        width: double.infinity,
+                        color: Colors.grey.shade200,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '☀️', // 해 이모지
+                              style: TextStyle(
+                                fontSize: 40, // 이모지 크기
+                              ),
+                            ),
+                            const SizedBox(width: 8), // 이모지와 텍스트 사이 간격
+                            Text(
+                              '오늘의 루틴', // 텍스트
+                              style: TextStyle(
+                                fontSize: 30, // 텍스트 크기
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green, // 텍스트 색상
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(child: _buildTable(currentItems)),
+                  ],
+                ),
+              ),
             ],
           ),
           if (_showAdditionalButtons)
@@ -243,7 +296,6 @@ class _HomePageState extends State<HomePage> {
           _screens[_currentIndex]
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -299,19 +351,23 @@ class _HomePageState extends State<HomePage> {
               Container(
                   height: 50, // 높이 지정
                   alignment: Alignment.center,
-                  child: Row (
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(item.emoji, style: const TextStyle(fontSize: 25),
+                      Text(
+                        item.emoji,
+                        style: const TextStyle(fontSize: 25),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         item.text,
-                        style: const TextStyle(fontSize: 18),
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green),
                       ),
                     ],
-                  )
-              ),
+                  )),
               Container(
                 height: 50,
                 alignment: Alignment.center,
@@ -353,108 +409,50 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-        child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: List.generate(tableRows.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.5),
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(width: 15),
-              Expanded(child: Table(
-                border: TableBorder.all(
-                  color: Colors.grey,
-                  width: 2,
-                  borderRadius: BorderRadius.circular(8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: List.generate(tableRows.length, (index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.5),
+                child: Text(
+                  '${index + 1}',
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey),
                 ),
-                columnWidths: const {
-                  0: FixedColumnWidth(100),
-                  1: FlexColumnWidth(),
-                  2: FixedColumnWidth(50),
-                },
-                children: tableRows.map((row) {
-                  return TableRow(
-                    children: row.children.map((cell) {
-                      return Container(
-                        color: Colors.grey.shade200, // 셀 내부 배경색을 회색으로 설정
-                        child: cell,
-                      );
-                    }).toList(),
-                  );
-                }).toList(),
-              ),)
-            ]
-        )
-    );
+              );
+            }),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Table(
+              border: TableBorder.all(
+                color: Colors.grey,
+                width: 2,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              columnWidths: const {
+                0: FixedColumnWidth(100),
+                1: FlexColumnWidth(),
+                2: FixedColumnWidth(50),
+              },
+              children: tableRows.map((row) {
+                return TableRow(
+                  children: row.children.map((cell) {
+                    return Container(
+                      color: Colors.grey.shade200, // 셀 내부 배경색을 회색으로 설정
+                      child: cell,
+                    );
+                  }).toList(),
+                );
+              }).toList(),
+            ),
+          )
+        ]));
   }
-
-  // Widget _buildTable(List<Item> currentItems) {
-  //   List<TableRow> tableRows = [];
-  //
-  //   for (int i = 0; i < 7; i++) {
-  //     if (i < currentItems.length) {
-  //       final item = currentItems[i];
-  //       tableRows.add(
-  //         TableRow(
-  //           children: [
-  //             Container(
-  //               height: 60,
-  //               alignment: Alignment.center,
-  //               child: Text(item.emoji, style: const TextStyle(fontSize: 32)),
-  //             ),
-  //             Container(
-  //               height: 60,
-  //               alignment: Alignment.center,
-  //               child: Text(
-  //                 item.text,
-  //                 style: const TextStyle(fontSize: 18),
-  //               ),
-  //             ),
-  //             Container(
-  //               height: 60,
-  //               alignment: Alignment.center,
-  //               child: Checkbox(
-  //                 value: item.checked,
-  //                 onChanged: (value) {
-  //                   setState(() {
-  //                     item.checked = value ?? false;
-  //                   });
-  //                 },
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     } else {
-  //       tableRows.add(
-  //         const TableRow(
-  //           children: [
-  //             SizedBox(height: 60),
-  //             SizedBox(height: 60),
-  //             SizedBox(height: 60),
-  //           ],
-  //         ),
-  //       );
-  //     }
-  //   }
-  //
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 20),
-  //     child: Table(
-  //       border: TableBorder.all(color: Colors.grey),
-  //       children: tableRows,
-  //     ),
-  //   );
-  // }
 
   Widget _buildCustomButton({
     required Widget icon,
@@ -470,6 +468,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 class Item {
   String emoji;
   String text;
@@ -481,6 +480,7 @@ class Item {
     required this.checked,
   });
 }
+
 // 수정된 RoutinePage 클래스 (빈 화면)
 class RoutinePage extends StatelessWidget {
   const RoutinePage({super.key});
@@ -490,11 +490,3 @@ class RoutinePage extends StatelessWidget {
     return const SizedBox.shrink(); // 빈 화면으로 변경
   }
 }
-
-
-
-
-
-
-
-
