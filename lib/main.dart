@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const LoginPage(),
+      home: const HomeScreen(),
     );
   }
 }
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const HomePage(),
     const NewsPage(),
     const StatsPage(),
-    const SettingPage(),
+    const InfoPage(),
   ];
 
   void _onTabTapped(int index) {
