@@ -3,6 +3,7 @@ import 'homePage.dart';
 import 'settingPage.dart';
 import 'statPage.dart';
 import 'newsPage.dart';
+import 'SelectitemsPage.dart';  // 추가된 SelectItemsPage import
 
 void main() {
   runApp(const MyApp());
@@ -32,11 +33,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  final Map<String, int> checkCounts = {};
 
   final List<Widget> _screens = [
-    const HomePage(),
+    const HomePage(),  // HomePage로 변경
     const NewsPage(),
-    const StatsPage(),
+    StatsPage(checkCounts: {}),
     const InfoPage(),
   ];
 
@@ -83,3 +85,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
