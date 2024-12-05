@@ -1,11 +1,11 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'loginPage.dart';  // 로그인 페이지로 이동
-import 'homePage.dart';   // HomePage 추가
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();  // Firebase 초기화
+import 'package:flutter/material.dart';
+import 'homePage.dart';
+import 'settingPage.dart';
+import 'statPage.dart';
+import 'newsPage.dart';
+
+void main() {
   runApp(const MyApp());
 }
 
@@ -19,9 +19,75 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const HomePage(),  // HomePage로 바로 이동
+      home: const HomeScreen(),
     );
   }
 }
 
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+  final Map<String, int> checkCounts = {};
+  late List<Widget> _screens; // 나중에 초기화
+
+  @override
+  void initState() {
+    super.initState();
+    // 초기화 시점에서 checkCounts를 사용해 _screens 설정
+    _screens = [
+      HomePage(checkCounts: checkCounts),
+      const NewsPage(),
+      StatsPage(checkCounts: checkCounts),
+      const SettingPage(),
+    ];
+  }
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('푸르게'),
+        backgroundColor: Colors.green,
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article),
+            label: 'News',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Stats',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info),
+            label: 'Info',
+          ),
+        ],
+      ),
+    );
+  }
+}

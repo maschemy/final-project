@@ -1,68 +1,36 @@
+
 import 'package:flutter/material.dart';
+import 'setting_file/privacy_policy_page.dart'; // 개인정보 처리방침 페이지
+import 'setting_file/help_support_page.dart'; // 도움말 및 지원 페이지
 
-class SettingPage extends StatefulWidget {
+class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
-
-  @override
-  _SettingPageState createState() => _SettingPageState();
-}
-
-class _SettingPageState extends State<SettingPage> {
-  bool _isDarkMode = false;  // 다크 모드 상태
-  bool _isNotificationsEnabled = true;  // 알림 설정 상태
-
-  // 다크 모드 토글
-  void _toggleTheme(bool value) {
-    setState(() {
-      _isDarkMode = value;
-    });
-  }
-
-  // 알림 설정 토글
-  void _toggleNotifications(bool value) {
-    setState(() {
-      _isNotificationsEnabled = value;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('설정'),
-        backgroundColor: Colors.green,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // 다크 모드 스위치
-            SwitchListTile(
-              title: const Text('다크 모드'),
-              subtitle: const Text('앱의 테마를 다크 모드로 변경'),
-              value: _isDarkMode,
-              onChanged: _toggleTheme,
-              activeColor: Colors.green,
-            ),
-            const Divider(),
-
-            // 알림 설정 스위치
-            SwitchListTile(
-              title: const Text('알림 설정'),
-              subtitle: const Text('업데이트 및 알림을 받습니다'),
-              value: _isNotificationsEnabled,
-              onChanged: _toggleNotifications,
-              activeColor: Colors.green,
-            ),
-            const Divider(),
-
-            // 계정 관리
+            // 언어 설정
             ListTile(
-              title: const Text('계정'),
-              subtitle: const Text('계정 정보 관리'),
-              leading: const Icon(Icons.account_circle),
+              title: const Text('언어 설정'),
+              subtitle: const Text('앱의 기본 언어를 선택하세요'),
+              leading: const Icon(Icons.language),
               onTap: () {
-                // 계정 관리 화면으로 이동할 수 있습니다.
+                _showLanguageDialog(context);
+              },
+            ),
+            const Divider(),
+
+            // 테마 선택
+            ListTile(
+              title: const Text('테마 설정'),
+              subtitle: const Text('앱의 테마를 변경합니다'),
+              leading: const Icon(Icons.color_lens),
+              onTap: () {
+                _showThemeDialog(context);
               },
             ),
             const Divider(),
@@ -72,17 +40,27 @@ class _SettingPageState extends State<SettingPage> {
               title: const Text('개인정보 처리방침'),
               leading: const Icon(Icons.lock),
               onTap: () {
-                // 개인정보 처리방침 페이지로 이동할 수 있습니다.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyPolicyPage(),
+                  ),
+                );
               },
             ),
             const Divider(),
 
-            // 도움말 & 지원
+            // 도움말 및 지원
             ListTile(
               title: const Text('도움말 및 지원'),
               leading: const Icon(Icons.help),
               onTap: () {
-                // 도움말 페이지로 이동할 수 있습니다.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HelpSupportPage(),
+                  ),
+                );
               },
             ),
           ],
@@ -90,5 +68,73 @@ class _SettingPageState extends State<SettingPage> {
       ),
     );
   }
-}
 
+  // 언어 선택 다이얼로그
+  void _showLanguageDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('언어 설정'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('한국어'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar(context, '한국어로 설정되었습니다.');
+                },
+              ),
+              ListTile(
+                title: const Text('English'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar(context, 'Language set to English.');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 테마 선택 다이얼로그
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('테마 설정'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Light Mode'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar(context, '라이트 모드로 설정되었습니다.');
+                },
+              ),
+              ListTile(
+                title: const Text('Dark Mode'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar(context, '다크 모드로 설정되었습니다.');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 스낵바 표시
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+}

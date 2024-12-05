@@ -1,108 +1,70 @@
 import 'package:flutter/material.dart';
-import 'newsPage.dart';
-import 'statPage.dart';
-import 'settingPage.dart'; // SettingPage 추가
-import 'loginPage.dart'; // LoginPage 추가
 import 'package:intl/intl.dart';
+import 'SelectitemsPage.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Map<String, int> checkCounts; // 날짜별 체크된 항목 수를 전달받음
+
+  const HomePage({super.key, required this.checkCounts});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0; // 현재 선택된 인덱스를 추적
-  bool _showAdditionalButtons = false;
   DateTime _selectedDate = DateTime.now();
   final Map<String, List<Item>> _itemsPerDate = {};
-  final List<Map<String, String>> _predefinedItems = [
-    {'emoji': '🌳', 'text': '나무 심기'},
-    {'emoji': '🚴', 'text': '자전거 타기'},
-    {'emoji': '💡', 'text': '전기 절약'},
-    {'emoji': '🚿', 'text': '물 절약'},
-    {'emoji': '🌞', 'text': '햇빛 사용'},
-    {'emoji': '🛍️', 'text': '에코백 사용'},
-    {'emoji': '🍃', 'text': '채식 식사'},
-  ];
 
-  final List<Widget> _screens = [
-    const RoutinePage(),
-    const NewsPage(),
-    const StatsPage(),
-    const SettingPage(),
-  ];
-
-  void _onTabTapped(int index) {
+  // 선택된 항목을 가져옵니다.
+  void _updateCheckCount() {
+    int checkedCount = 0;
+    List<Item> currentItems = _itemsPerDate[_selectedDate.toString()] ?? [];
+    for (var item in currentItems) {
+      if (item.checked) {
+        checkedCount++;
+      }
+    }
+    // 체크된 항목 수 업데이트
     setState(() {
-      _currentIndex = index; // 탭이 변경되면 선택된 인덱스를 갱신
+      widget.checkCounts[_selectedDate.toString()] = checkedCount;
     });
   }
 
-  void _toggleAdditionalButtons() {
-    setState(() {
-      _showAdditionalButtons = !_showAdditionalButtons;
-    });
+  void _addItemFromSelectPage() async {
+    final selectedItem = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectItemsPage(),
+      ),
+    );
+
+    if (selectedItem != null) {
+      setState(() {
+        final itemList = _itemsPerDate[_selectedDate.toString()] ?? [];
+        if (itemList.length < 7) {
+          itemList.add(Item(emoji: selectedItem['emoji'], text: selectedItem['text'], checked: false));
+          _itemsPerDate[_selectedDate.toString()] = itemList;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('항목은 최대 7개까지 추가할 수 있습니다.')),
+          );
+        }
+      });
+    }
   }
 
   List<DateTime> _getCurrentWeekDates() {
     DateTime today = _selectedDate;
     int currentWeekday = today.weekday;
-    DateTime firstDayOfWeek =
-        today.subtract(Duration(days: currentWeekday - 1));
-    return List.generate(
-        7, (index) => firstDayOfWeek.add(Duration(days: index)));
+    DateTime firstDayOfWeek = today.subtract(Duration(days: currentWeekday - 1));
+    return List.generate(7, (index) => firstDayOfWeek.add(Duration(days: index)));
   }
 
-  void _addPredefinedItem() async {
-    List<Item> itemList = _itemsPerDate[_selectedDate.toString()] ?? [];
-
-    if (itemList.length >= 7) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('항목은 최대 7개까지 추가할 수 있습니다.')),
-      );
-      return;
-    }
-
-    Map<String, String>? selectedItem = await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('항목 선택'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: _predefinedItems.length,
-              itemBuilder: (context, index) {
-                final item = _predefinedItems[index];
-                return ListTile(
-                  leading: Text(item['emoji']!,
-                      style: const TextStyle(fontSize: 24)),
-                  title: Text(item['text']!),
-                  onTap: () {
-                    Navigator.of(context).pop(item);
-                  },
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-
-    if (selectedItem != null) {
-      setState(() {
-        final newItem = Item(
-          emoji: selectedItem['emoji']!,
-          text: selectedItem['text']!,
-          checked: false,
-        );
-        itemList.add(newItem);
-        _itemsPerDate[_selectedDate.toString()] = itemList;
-      });
-    }
+  void _toggleCheck(Item item) {
+    setState(() {
+      item.checked = !item.checked;
+      _updateCheckCount();
+    });
   }
 
   @override
@@ -110,24 +72,8 @@ class _HomePageState extends State<HomePage> {
     List<DateTime> weekDates = _getCurrentWeekDates();
     String currentMonthYear = DateFormat('yyyy년 M월').format(_selectedDate);
     List<Item> currentItems = _itemsPerDate[_selectedDate.toString()] ?? [];
-
+    _updateCheckCount(); // 체크된 항목 수 업데이트
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Routine"),
-        backgroundColor: Colors.green,
-        actions: [
-          // 로그아웃 버튼 추가
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              );
-            },
-          ),
-        ],
-      ),
       body: Stack(
         alignment: Alignment.bottomRight,
         children: [
@@ -137,8 +83,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   currentMonthYear,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               GestureDetector(
@@ -146,13 +91,11 @@ class _HomePageState extends State<HomePage> {
                   if (details.primaryVelocity != null) {
                     if (details.primaryVelocity! < 0) {
                       setState(() {
-                        _selectedDate =
-                            _selectedDate.add(const Duration(days: 7));
+                        _selectedDate = _selectedDate.add(const Duration(days: 7));
                       });
                     } else if (details.primaryVelocity! > 0) {
                       setState(() {
-                        _selectedDate =
-                            _selectedDate.subtract(const Duration(days: 7));
+                        _selectedDate = _selectedDate.subtract(const Duration(days: 7));
                       });
                     }
                   }
@@ -173,34 +116,23 @@ class _HomePageState extends State<HomePage> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color:
-                                isSelected ? Colors.green : Colors.transparent,
+                            color: isSelected ? Colors.green : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(8),
                           child: Column(
                             children: [
                               Text(
-                                [
-                                  '월',
-                                  '화',
-                                  '수',
-                                  '목',
-                                  '금',
-                                  '토',
-                                  '일'
-                                ][date.weekday - 1],
+                                ['월', '화', '수', '목', '금', '토', '일'][date.weekday - 1],
                                 style: TextStyle(
-                                  color:
-                                      isSelected ? Colors.white : Colors.black,
+                                  color: isSelected ? Colors.white : Colors.black,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '${date.day}',
                                 style: TextStyle(
-                                  color:
-                                      isSelected ? Colors.white : Colors.black,
+                                  color: isSelected ? Colors.white : Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -213,111 +145,17 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              Expanded(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 30), // 회색 박스
-                      child: Container(
-                        width: double.infinity,
-                        color: Colors.grey.shade200,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '☀️', // 해 이모지
-                              style: TextStyle(
-                                fontSize: 40, // 이모지 크기
-                              ),
-                            ),
-                            const SizedBox(width: 8), // 이모지와 텍스트 사이 간격
-                            Text(
-                              '오늘의 루틴', // 텍스트
-                              style: TextStyle(
-                                fontSize: 30, // 텍스트 크기
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green, // 텍스트 색상
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(child: _buildTable(currentItems)),
-                  ],
-                ),
-              ),
+              Expanded(child: _buildTable(currentItems)),
             ],
           ),
-          if (_showAdditionalButtons)
-            Positioned(
-              bottom: 80,
-              right: 16,
-              child: _buildCustomButton(
-                icon: const Text(
-                  'AI',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                label: 'AI를 활용한 항목 추가하기',
-                color: Colors.lightGreen,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('AI 항목 추가하기 버튼 눌림')),
-                  );
-                },
-              ),
-            ),
-          if (_showAdditionalButtons)
-            Positioned(
-              bottom: 140,
-              right: 16,
-              child: _buildCustomButton(
-                icon: const Icon(Icons.edit, color: Colors.white),
-                label: '직접 항목 추가하기',
-                color: Colors.lightGreen,
-                onTap: _addPredefinedItem,
-              ),
-            ),
           Positioned(
             bottom: 16,
             right: 16,
             child: FloatingActionButton(
-              onPressed: _toggleAdditionalButtons,
-              child: Icon(_showAdditionalButtons ? Icons.close : Icons.add),
+              onPressed: _addItemFromSelectPage,
+              child: const Icon(Icons.add),
               backgroundColor: Colors.green,
             ),
-          ),
-          _screens[_currentIndex]
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: '루틴',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.article),
-            label: '뉴스',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: '통계',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '설정',
           ),
         ],
       ),
@@ -334,7 +172,30 @@ class _HomePageState extends State<HomePage> {
           TableRow(
             children: [
               Container(
-                height: 50,
+                height: 60,
+                alignment: Alignment.center,
+                child: Text(item.emoji, style: const TextStyle(fontSize: 32)),
+              ),
+              Container(
+                height: 60,
+                alignment: Alignment.center,
+                child: Text(
+                  item.text,
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ),
+              Container(
+                height: 60,
+                alignment: Alignment.center,
+                child: Checkbox(
+                  value: item.checked,
+                  onChanged: (value) {
+                    _toggleCheck(item);
+                  },
+                ),
+              ),
+              Container(
+                height: 60,
                 alignment: Alignment.center,
                 child: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
@@ -348,38 +209,6 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-              Container(
-                  height: 50, // 높이 지정
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        item.emoji,
-                        style: const TextStyle(fontSize: 25),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        item.text,
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green),
-                      ),
-                    ],
-                  )),
-              Container(
-                height: 50,
-                alignment: Alignment.center,
-                child: Checkbox(
-                  value: item.checked,
-                  onChanged: (value) {
-                    setState(() {
-                      item.checked = value ?? false;
-                    });
-                  },
-                ),
-              ),
             ],
           ),
         );
@@ -388,17 +217,22 @@ class _HomePageState extends State<HomePage> {
           TableRow(
             children: [
               Container(
-                height: 50,
+                height: 60,
                 alignment: Alignment.center,
                 child: const SizedBox(),
               ),
               Container(
-                height: 50,
+                height: 60,
                 alignment: Alignment.center,
                 child: const SizedBox(),
               ),
               Container(
-                height: 50,
+                height: 60,
+                alignment: Alignment.center,
+                child: const SizedBox(),
+              ),
+              Container(
+                height: 60,
                 alignment: Alignment.center,
                 child: const SizedBox(),
               ),
@@ -408,63 +242,23 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: List.generate(tableRows.length, (index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.5),
-                child: Text(
-                  '${index + 1}',
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),
-                ),
-              );
-            }),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Table(
-              border: TableBorder.all(
-                color: Colors.grey,
-                width: 2,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              columnWidths: const {
-                0: FixedColumnWidth(100),
-                1: FlexColumnWidth(),
-                2: FixedColumnWidth(50),
-              },
-              children: tableRows.map((row) {
-                return TableRow(
-                  children: row.children.map((cell) {
-                    return Container(
-                      color: Colors.grey.shade200, // 셀 내부 배경색을 회색으로 설정
-                      child: cell,
-                    );
-                  }).toList(),
-                );
-              }).toList(),
-            ),
-          )
-        ]));
-  }
-
-  Widget _buildCustomButton({
-    required Widget icon,
-    required String label,
-    required Color color,
-    required void Function() onTap,
-  }) {
-    return FloatingActionButton.extended(
-      onPressed: onTap,
-      label: Text(label),
-      icon: icon,
-      backgroundColor: color,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.grey[200],
+      child: Table(
+        border: TableBorder.all(
+          color: Colors.grey,
+          width: 2,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        columnWidths: const {
+          0: FixedColumnWidth(60),
+          1: FlexColumnWidth(),
+          2: FixedColumnWidth(60),
+          3: FixedColumnWidth(60),
+        },
+        children: tableRows,
+      ),
     );
   }
 }
@@ -481,12 +275,3 @@ class Item {
   });
 }
 
-// 수정된 RoutinePage 클래스 (빈 화면)
-class RoutinePage extends StatelessWidget {
-  const RoutinePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink(); // 빈 화면으로 변경
-  }
-}
