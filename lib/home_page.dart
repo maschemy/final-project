@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'SelectitemsPage.dart';
+import 'select_items_page.dart';
 
 class HomePage extends StatefulWidget {
   final Map<String, int> checkCounts; // 날짜별 체크된 항목 수를 전달받음
@@ -8,7 +8,7 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.checkCounts});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -153,8 +153,8 @@ class _HomePageState extends State<HomePage> {
             right: 16,
             child: FloatingActionButton(
               onPressed: _addItemFromSelectPage,
-              child: const Icon(Icons.add),
               backgroundColor: Colors.green,
+              child: const Icon(Icons.add),
             ),
           ),
         ],

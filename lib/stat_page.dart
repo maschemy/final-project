@@ -10,7 +10,7 @@ class StatsPage extends StatefulWidget {
   const StatsPage({super.key, required this.checkCounts});
 
   @override
-  _StatsPageState createState() => _StatsPageState();
+  State<StatsPage> createState() => _StatsPageState();
 }
 
 class _StatsPageState extends State<StatsPage> {

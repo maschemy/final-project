@@ -7,7 +7,7 @@ class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
 
   @override
-  _NewsPageState createState() => _NewsPageState();
+  State<NewsPage> createState() => _NewsPageState();
 }
 
 class _NewsPageState extends State<NewsPage> {

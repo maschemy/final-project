@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'homePage.dart';
-import 'settingPage.dart';
-import 'statPage.dart';
-import 'newsPage.dart';
+import 'home_page.dart';
+import 'setting_page.dart';
+import 'stat_page.dart';
+import 'news_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +28,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {

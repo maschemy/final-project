@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SelectItemsPage extends StatelessWidget {
-  const SelectItemsPage({Key? key}) : super(key: key);
+  const SelectItemsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
