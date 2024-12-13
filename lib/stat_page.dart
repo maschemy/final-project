@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import 'select_items_page.dart'; // SelectedItemsDatabase 사용을 위해 필요
+import 'select_items_page.dart';
 
 class StatsPage extends StatefulWidget {
-  final Map<String, int> checkCounts; // main.dart에서 기존대로 checkCounts를 받는다.
+  final Map<String, int> checkCounts;
 
   const StatsPage({super.key, required this.checkCounts});
 
@@ -28,18 +28,20 @@ class _StatsPageState extends State<StatsPage> {
     return ValueListenableBuilder<int>(
       valueListenable: SelectedItemsDatabase.itemsChangeNotifier,
       builder: (context, _, __) {
-        int selectedCheckCount = 0;
         double carbonReduction = 0.0;
 
         if (_selectedDay != null) {
           String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDay!);
-          selectedCheckCount = widget.checkCounts[formattedDate] ?? 0;
-
-          // 선택된 날짜의 아이템 중 checked == true인 항목만 탄소발자국 합산
           List<Map<String, dynamic>> itemsForDay = SelectedItemsDatabase.itemsPerDate[formattedDate] ?? [];
           for (var item in itemsForDay) {
             if (item['checked'] == true) {
-              carbonReduction += (item['carbonReduction'] as double? ?? 0.0);
+              double parsedCarbon = 0.0;
+              if (item['carbonReduction'] is double) {
+                parsedCarbon = item['carbonReduction'];
+              } else if (item['carbonReduction'] != null) {
+                parsedCarbon = double.tryParse(item['carbonReduction'].toString()) ?? 0.0;
+              }
+              carbonReduction += parsedCarbon;
             }
           }
         }
@@ -132,14 +134,6 @@ class _StatsPageState extends State<StatsPage> {
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              '체크된 항목: $selectedCheckCount개',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
                               ),
                             ),
                           ],

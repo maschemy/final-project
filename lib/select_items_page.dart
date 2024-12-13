@@ -44,7 +44,7 @@ class SelectItemsPage extends StatelessWidget {
               SelectedItemsDatabase.itemsPerDate.putIfAbsent(formattedDate, () => []);
               final selectedItem = {
                 ...items[index],
-                'checked': false, // 처음 선택 시 기본 체크상태 false
+                'checked': true, // 선택 시 바로 checked 상태를 true로 지정
               };
               SelectedItemsDatabase.itemsPerDate[formattedDate]!.add(selectedItem);
               SelectedItemsDatabase.itemsChangeNotifier.value++;
