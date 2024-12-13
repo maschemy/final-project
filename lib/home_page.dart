@@ -18,7 +18,10 @@ class _HomePageState extends State<HomePage> {
   // 선택된 항목을 가져옵니다.
   void _updateCheckCount() {
     int checkedCount = 0;
-    List<Item> currentItems = _itemsPerDate[_selectedDate.toString()] ?? [];
+    String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+
+    // 현재 날짜의 체크된 항목 수 계산
+    List<Item> currentItems = _itemsPerDate[formattedDate] ?? [];
     for (var item in currentItems) {
       if (item.checked) {
         checkedCount++;
@@ -26,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     }
     // 체크된 항목 수 업데이트
     setState(() {
-      widget.checkCounts[_selectedDate.toString()] = checkedCount;
+      widget.checkCounts[formattedDate] = checkedCount;
     });
   }
 
@@ -40,12 +43,15 @@ class _HomePageState extends State<HomePage> {
 
     if (selectedItem != null) {
       setState(() {
-        final itemList = _itemsPerDate[_selectedDate.toString()] ?? [];
+        final formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+        final itemList = _itemsPerDate[formattedDate] ?? [];
         if (itemList.length < 7) {
-          itemList.add(Item(emoji: selectedItem['emoji'],
-              text: selectedItem['text'],
-              checked: false));
-          _itemsPerDate[_selectedDate.toString()] = itemList;
+          itemList.add(Item(
+            emoji: selectedItem['emoji'],
+            text: selectedItem['text'],
+            checked: false,
+          ));
+          _itemsPerDate[formattedDate] = itemList;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('항목은 최대 7개까지 추가할 수 있습니다.')),
@@ -58,10 +64,8 @@ class _HomePageState extends State<HomePage> {
   List<DateTime> _getCurrentWeekDates() {
     DateTime today = _selectedDate;
     int currentWeekday = today.weekday;
-    DateTime firstDayOfWeek = today.subtract(
-        Duration(days: currentWeekday - 1));
-    return List.generate(
-        7, (index) => firstDayOfWeek.add(Duration(days: index)));
+    DateTime firstDayOfWeek = today.subtract(Duration(days: currentWeekday - 1));
+    return List.generate(7, (index) => firstDayOfWeek.add(Duration(days: index)));
   }
 
   void _toggleCheck(Item item) {
@@ -75,8 +79,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     List<DateTime> weekDates = _getCurrentWeekDates();
     String currentMonthYear = DateFormat('yyyy년 M월').format(_selectedDate);
-    List<Item> currentItems = _itemsPerDate[_selectedDate.toString()] ?? [];
-    _updateCheckCount(); // 체크된 항목 수 업데이트
+    String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    List<Item> currentItems = _itemsPerDate[formattedDate] ?? [];
+
     return Scaffold(
       body: Stack(
         alignment: Alignment.bottomRight,
@@ -87,8 +92,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   currentMonthYear,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               GestureDetector(
@@ -96,13 +100,11 @@ class _HomePageState extends State<HomePage> {
                   if (details.primaryVelocity != null) {
                     if (details.primaryVelocity! < 0) {
                       setState(() {
-                        _selectedDate = _selectedDate.add(const Duration(
-                            days: 7));
+                        _selectedDate = _selectedDate.add(const Duration(days: 7));
                       });
                     } else if (details.primaryVelocity! > 0) {
                       setState(() {
-                        _selectedDate = _selectedDate.subtract(const Duration(
-                            days: 7));
+                        _selectedDate = _selectedDate.subtract(const Duration(days: 7));
                       });
                     }
                   }
@@ -123,27 +125,23 @@ class _HomePageState extends State<HomePage> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.green : Colors
-                                .transparent,
+                            color: isSelected ? Colors.green : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(8),
                           child: Column(
                             children: [
                               Text(
-                                ['월', '화', '수', '목', '금', '토', '일'][date
-                                    .weekday - 1],
+                                ['월', '화', '수', '목', '금', '토', '일'][date.weekday - 1],
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors
-                                      .black,
+                                  color: isSelected ? Colors.white : Colors.black,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '${date.day}',
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors
-                                      .black,
+                                  color: isSelected ? Colors.white : Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -160,29 +158,25 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     Padding(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 30), // 회색 박스
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Container(
                         width: double.infinity,
                         color: Colors.grey.shade200,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '☀️', // 해 이모지
-                              style: TextStyle(
-                                fontSize: 40, // 이모지 크기
-                              ),
+                              '☀️',
+                              style: const TextStyle(fontSize: 40),
                             ),
-                            const SizedBox(width: 8), // 이모지와 텍스트 사이 간격
+                            const SizedBox(width: 8),
                             Text(
-                              '오늘의 루틴', // 텍스트
+                              '오늘의 루틴',
                               style: TextStyle(
-                                fontSize: 30, // 텍스트 크기
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green, // 텍스트 색상
+                                color: Colors.green,
                               ),
                             ),
                           ],
@@ -220,23 +214,20 @@ class _HomePageState extends State<HomePage> {
           TableRow(
             children: [
               Container(
-                  height: 50, // 높이 지정
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(item.emoji, style: const TextStyle(fontSize: 25),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        item.text,
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green),
-                      ),
-                    ],
-                  )
+                height: 50,
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(item.emoji, style: const TextStyle(fontSize: 25)),
+                    const SizedBox(width: 8),
+                    Text(
+                      item.text,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+                    ),
+                  ],
+                ),
               ),
               Container(
                 height: 50,
@@ -257,7 +248,8 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       currentItems.removeAt(i);
                       if (currentItems.isEmpty) {
-                        _itemsPerDate.remove(_selectedDate.toString());
+                        final formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+                        _itemsPerDate.remove(formattedDate);
                       }
                     });
                   },
@@ -292,8 +284,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: List.generate(tableRows.length, (index) {
@@ -301,10 +295,8 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(vertical: 10.5),
                 child: Text(
                   '${index + 1}',
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+                ),
               );
             }),
           ),
@@ -325,15 +317,17 @@ class _HomePageState extends State<HomePage> {
                 return TableRow(
                   children: row.children.map((cell) {
                     return Container(
-                      color: Colors.grey.shade200, // 셀 내부 배경색을 회색으로 설정
+                      color: Colors.grey.shade200,
                       child: cell,
                     );
                   }).toList(),
                 );
               }).toList(),
             ),
-          )
-        ]));
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -343,8 +337,8 @@ class Item {
   bool checked;
 
   Item({
-  required this.emoji,
-  required this.text,
-  required this.checked,
+    required this.emoji,
+    required this.text,
+    required this.checked,
   });
 }

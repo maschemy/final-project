@@ -1,11 +1,9 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
 class StatsPage extends StatefulWidget {
-  final Map<String, int> checkCounts;  // 날짜별 체크된 항목 수를 전달받음
+  final Map<String, int> checkCounts; // 날짜별 체크된 항목 수를 전달받음
 
   const StatsPage({super.key, required this.checkCounts});
 
@@ -41,6 +39,7 @@ class _StatsPageState extends State<StatsPage> {
             });
           },
           calendarBuilders: CalendarBuilders(
+            // 기본 날짜 렌더링
             defaultBuilder: (context, day, focusedDay) {
               String formattedDate = DateFormat('yyyy-MM-dd').format(day);
               int checkCount = widget.checkCounts[formattedDate] ?? 0;
@@ -48,6 +47,20 @@ class _StatsPageState extends State<StatsPage> {
                 margin: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: _getColorBasedOnCheckCount(checkCount),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(child: Text('${day.day}')),
+              );
+            },
+            // 오늘 날짜 렌더링
+            todayBuilder: (context, day, focusedDay) {
+              String formattedDate = DateFormat('yyyy-MM-dd').format(day);
+              int checkCount = widget.checkCounts[formattedDate] ?? 0;
+              return Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: _getColorBasedOnCheckCount(checkCount),
+                  border: Border.all(color: Colors.green, width: 2), // 테두리 추가
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(child: Text('${day.day}')),
