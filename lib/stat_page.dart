@@ -120,7 +120,7 @@ class _StatsPageState extends State<StatsPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Text(
-                              '오늘의 탄소발자국 절감량',
+                              '탄소발자국 절감량',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
