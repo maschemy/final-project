@@ -57,10 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('푸르게'),
-        backgroundColor: Colors.green,
-      ),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,

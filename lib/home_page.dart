@@ -83,6 +83,10 @@ class _HomePageState extends State<HomePage> {
     List<Item> currentItems = _itemsPerDate[formattedDate] ?? [];
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('홈',style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.green,
+      ),
       body: Stack(
         alignment: Alignment.bottomRight,
         children: [

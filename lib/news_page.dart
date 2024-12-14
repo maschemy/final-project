@@ -55,7 +55,8 @@ class _NewsPageState extends State<NewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('탄소중립 관련 뉴스'),
+        title: const Text('뉴스',style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.green,
       ),
       body: newsList.isNotEmpty
           ? ListView.builder(

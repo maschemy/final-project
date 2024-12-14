@@ -47,6 +47,10 @@ class _StatsPageState extends State<StatsPage> {
         }
 
         return Scaffold(
+          appBar: AppBar(
+            title: const Text('통계',style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.green,
+          ),
           body: Stack(
             children: [
               Column(
@@ -100,7 +104,18 @@ class _StatsPageState extends State<StatsPage> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 120), // 위쪽 간격 설정
+                      child: Image.asset(
+                      'assets/img/save_earth.png', // 이미지 경로
+                      width: 400,
+                      height: 300,
+                      fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               if (_selectedDay != null)
