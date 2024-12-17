@@ -42,13 +42,31 @@ class SelectItemsPage extends StatelessWidget {
             title: Text(items[index]['text'].toString()),
             onTap: () {
               SelectedItemsDatabase.itemsPerDate.putIfAbsent(formattedDate, () => []);
+
               final selectedItem = {
                 ...items[index],
                 'checked': true, // 선택 시 바로 checked 상태를 true로 지정
               };
-              SelectedItemsDatabase.itemsPerDate[formattedDate]!.add(selectedItem);
-              SelectedItemsDatabase.itemsChangeNotifier.value++;
-              Navigator.pop(context, selectedItem);
+
+              // 중복 항목 확인
+              bool isDuplicate = SelectedItemsDatabase.itemsPerDate[formattedDate]!.any((item) {
+                return item['text'] == selectedItem['text'];
+              });
+
+              if (isDuplicate) {
+                // 중복된 경우 SnackBar 표시
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('이미 추가된 항목입니다.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                // 중복이 아닌 경우 항목 추가
+                SelectedItemsDatabase.itemsPerDate[formattedDate]!.add(selectedItem);
+                SelectedItemsDatabase.itemsChangeNotifier.value++;
+                Navigator.pop(context, selectedItem);
+              }
             },
           );
         },
